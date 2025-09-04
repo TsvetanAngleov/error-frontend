@@ -1,0 +1,26 @@
+{
+  "name": "error-frontend",
+  "version": "1.0.0",
+  "description": "A TypeScript project that serves an error page",
+  "scripts": {
+    "build": "webpack --mode=production",
+    "start": "webpack serve --mode=development",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "typescript",
+    "error-page",
+    "html",
+    "webpack"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0",
+    "ts-loader": "^9.4.0",
+    "html-webpack-plugin": "^5.5.0"
+  }
+}

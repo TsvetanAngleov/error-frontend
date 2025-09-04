@@ -1,0 +1,82 @@
+name: Deploy Reusable
+
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT:
+        description: 'Environment to deploy to'
+        required: true
+        type: string
+      APP_ENVIRONMENT:
+        description: 'Application environment'
+        required: true
+        type: string
+      APP_GIT_TAG:
+        description: 'Git tag to deploy'
+        required: true
+        type: string
+      ALLOWED_USERS:
+        description: 'Comma-separated list of allowed users'
+        required: false
+        type: string
+
+jobs:
+  build-and-deploy:
+    name: 'Build and Deploy to ${{ inputs.ENVIRONMENT }}'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.APP_GIT_TAG }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Build for production
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Create deployment artifact
+        run: |
+          tar -czf error-frontend-${{ inputs.APP_GIT_TAG }}.tar.gz -C dist .
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-frontend-build-${{ inputs.ENVIRONMENT }}
+          path: error-frontend-${{ inputs.APP_GIT_TAG }}.tar.gz
+          retention-days: 30
+
+      - name: Deploy to ${{ inputs.ENVIRONMENT }}
+        run: |
+          echo "Deploying to ${{ inputs.ENVIRONMENT }} environment"
+          echo "Git tag: ${{ inputs.APP_GIT_TAG }}"
+          echo "App environment: ${{ inputs.APP_ENVIRONMENT }}"
+          # Add your deployment logic here
+          # This could be:
+          # - Upload to S3/CloudFront
+          # - Deploy to Kubernetes
+          # - Deploy to Docker registry
+          # - Deploy to CDN
+          # - etc.
+
+      - name: Health check
+        run: |
+          echo "Performing health check for ${{ inputs.ENVIRONMENT }}"
+          # Add health check logic here
+          # This could be:
+          # - Check if the deployed app is responding
+          # - Run smoke tests
+          # - Verify deployment status

@@ -1,0 +1,20 @@
+name: Deploy to Prod
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      APP_GIT_TAG:
+        description: 'The git tag to check out'
+        required: true
+        type: string
+
+jobs:
+  trigger-reusable:
+    name: 'Trigger Deploy FE to Prod'
+    uses: ./.github/workflows/deploy-reusable.yml
+    with:
+      ENVIRONMENT: prd
+      APP_ENVIRONMENT: prod
+      APP_GIT_TAG: ${{ inputs.APP_GIT_TAG || github.ref }}
+      ALLOWED_USERS: ${{ vars.PRD_ALLOWED_USERS }}
